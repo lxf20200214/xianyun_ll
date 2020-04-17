@@ -1,9 +1,23 @@
 <template>
   <div>
+    <!-- 头部组件 -->
+    <Header />
+    <!-- 内容占位组件 -->
     <nuxt />
   </div>
 </template>
 
+<script>
+// 导入头部组件
+import Header from "@/components/header";
+
+export default {
+  // 注册组件
+  components: {
+    Header
+  }
+};
+</script>
 <style>
 html {
   font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
