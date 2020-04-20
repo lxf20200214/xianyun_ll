@@ -1,11 +1,13 @@
 <template>
   <el-form :model="form" ref="form" :rules="rules" class="form">
-    <el-form-item class="form-item">
-      <el-input placeholder="用户名手机"> </el-input>
+    <el-form-item class="form-item" prop="username">
+      <!-- 用户名 -->
+      <el-input placeholder="用户名手机" v-model="form.username"> </el-input>
     </el-form-item>
 
-    <el-form-item class="form-item">
-      <el-input placeholder="验证码">
+    <el-form-item class="form-item" prop="captcha">
+      <!-- 验证码 -->
+      <el-input placeholder="验证码" v-model="form.captcha">
         <template slot="append">
           <el-button @click="handleSendCaptcha">
             发送验证码
@@ -14,16 +16,28 @@
       </el-input>
     </el-form-item>
 
-    <el-form-item class="form-item">
-      <el-input placeholder="你的名字"> </el-input>
+    <el-form-item class="form-item" prop="nickname">
+      <!-- 昵称 -->
+      <el-input placeholder="你的名字" v-model="form.nickname"> </el-input>
     </el-form-item>
 
-    <el-form-item class="form-item">
-      <el-input placeholder="密码" type="password"></el-input>
+    <el-form-item class="form-item" prop="password">
+      <!-- 密码 -->
+      <el-input
+        placeholder="密码"
+        type="password"
+        v-model="form.password"
+      ></el-input>
     </el-form-item>
 
-    <el-form-item class="form-item">
-      <el-input placeholder="确认密码" type="password"> </el-input>
+    <el-form-item class="form-item" prop="checkPassword">
+      <!-- 确认密码 -->
+      <el-input
+        placeholder="确认密码"
+        type="password"
+        v-model="form.checkPassword"
+      >
+      </el-input>
     </el-form-item>
 
     <el-button class="submit" type="primary" @click="handleRegSubmit">
@@ -35,20 +49,74 @@
 <script>
 export default {
   data() {
+    //   确认密码输入框失去焦点时候触发的验证函数
+    // rule:表示当前的规制,这个不需要使用
+    // value:是输入框的值
+    // callback:是必须要调用,可以传入Error对象,实现报错,(new Error是JavaScript原生的方法)
+    const validatePassword = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value != this.form.password) {
+        callback(new Error("两次输入密码不一致"));
+      } else {
+        // 正常通过
+        callback();
+      }
+    };
     return {
       // 表单数据
-      form: {},
+      form: {
+        username: "", //手机号码
+        nickname: "", //昵称
+        captcha: "", //手机验证码
+        password: "", //密码
+        checkPassword: "" //确认密码
+      },
       // 表单规则
-      rules: {}
+      rules: {
+        username: [
+          { required: true, message: "请输入手机号码", trigger: "blur" }
+        ],
+        nickname: [
+          { required: true, message: "请输入昵称", trigger: "blur" },
+          { min: 2, max: 6, message: "长度在2到6位字符", trigger: "blur" }
+        ],
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        // validator自定义验证,validatePassword是验证的函数
+        checkPassword: [{ validator: validatePassword, trigger: "blur" }]
+      }
     };
   },
   methods: {
     // 发送验证码
-    handleSendCaptcha() {},
+    handleSendCaptcha() {
+      // 如果手机号码为空,直接返回
+      if (this.form.username === "") {
+        // 主动的触发表单某个属性字段的检验,并且会主动发生错误提示
+        this.$refs.form.validateField("username");
+        return;
+      }
+      //   请求发送验证码的接口
+      this.$store.dispatch("user/sendCaptcha", this.form.username).then(res => {
+        this.$message.success("模拟的验证码是:" + res);
+      });
+    },
 
     // 注册
     handleRegSubmit() {
-      console.log(this.form);
+      //   请求注册的接口
+      // element表单的valiate写法几乎是固定的
+      this.$refs.form.validate(valid => {
+        // 删除this.form的checkPassword属性
+        // 解构提取出某个属性,剩余的所有属性用other来表示
+        const { checkPassword, ...other } = this.form;
+        // 调用actions下的register方法
+        this.$store.dispatch("user/register", other).then(res => {
+          this.$message.success("恭喜你,注册成");
+          // 跳转到首页
+          this.$router.replace("/");
+        });
+      });
     }
   }
 };

@@ -1,7 +1,13 @@
 // 存放仓库该分类(user)下的数据,export const state=()是固定的格式
-export const state = {
-  // 登录成功后接口返回的用户数据,里面包含了token和用户的详细信息
-  userInfo: {}
+// export const state = {
+//   // 登录成功后接口返回的用户数据,里面包含了token和用户的详细信息
+//   userInfo: {}
+// };
+// 这样写浏览器不会报警告
+export const state = () => {
+  return {
+    userInfo: {}
+  };
 };
 
 // 同步修改state中的数据export const mutations={}是固定的格式
@@ -28,6 +34,39 @@ export const actions = {
       method: "post",
       data
     }).then(res => {
+      const { data } = res;
+      // 通过store.commit调用mutations的方法,修改仓库数据
+      // 由于是在同一个模块下,可以省略前面的user名字
+      store.commit("setUserInfo", data);
+      // return一个返回值,传递给下一个then
+      return data;
+    });
+  },
+  // 发送手机验证码
+  sendCaptcha(store, tel) {
+    //   请求发送验证码的接口
+    return this.$axios({
+      url: "/captchas",
+      method: "POST",
+      data: {
+        // 手机号码
+        tel
+      }
+    }).then(res => {
+      //   接口主要调用成功了,都认为短信已经成功的发送到用户的手机上了
+      const { code } = res.data;
+
+      return code;
+    });
+  },
+  // 注册,注册接口调用成功后和登录的操作是一样
+  register(store, data) {
+    return this.$axios({
+      url: "/accounts/register",
+      method: "post",
+      data
+    }).then(res => {
+      // data是用户的数据
       const { data } = res;
       // 通过store.commit调用mutations的方法,修改仓库数据
       // 由于是在同一个模块下,可以省略前面的user名字

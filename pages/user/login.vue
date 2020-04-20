@@ -10,8 +10,7 @@
             v-for="(item, index) in [`登录`, `注册`]"
             :key="index"
             @click="handleChangeTab(index)"
-            >{{ item }}</span
-          >
+          >{{ item }}</span>
         </el-row>
 
         <!-- 登录功能组件 -->
@@ -33,7 +32,7 @@ import RegisterForm from "@/components/user/registerForm";
 export default {
   data() {
     return {
-      currentTab: 1
+      currentTab: 0
     };
   },
   components: {
