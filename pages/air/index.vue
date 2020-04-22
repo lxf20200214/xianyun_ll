@@ -19,7 +19,10 @@
     <!-- 广告 -->
     <el-row type="flex" class="statement">
       <el-col :span="8">
-        <i class="iconfont iconweibiaoti-_huabanfuben" style="color:#409EFF;"></i>
+        <i
+          class="iconfont iconweibiaoti-_huabanfuben"
+          style="color:#409EFF;"
+        ></i>
         <span>100%航协认证</span>
       </el-col>
       <el-col :span="8">
@@ -38,7 +41,23 @@
     </h2>
 
     <!-- 特价机票 -->
-    <div class="air-sale"></div>
+    <div class="air-sale">
+      <el-row type="flex" class="air-sale-pic" justify="space-between">
+        <el-col :span="6" v-for="(item, index) in sales" :key="index">
+          <nuxt-link
+            :to="
+              `/air/flights?departCity=${item.departCity}&departCode=${item.departCode}&destCity=${item.destCity}&destCode=${item.destCode}&departDate=${item.departDate}`
+            "
+          >
+            <img :src="item.cover" />
+            <el-row class="layer-bar" type="flex" justify="space-between">
+              <span>{{ item.departCity }}-{{ item.destCity }}</span>
+              <span>￥{{ item.price }}</span>
+            </el-row>
+          </nuxt-link>
+        </el-col>
+      </el-row>
+    </div>
   </section>
 </template>
 
@@ -46,9 +65,26 @@
 // 导入搜索组件
 import SearchForm from "@/components/air/searchForm";
 export default {
+  data() {
+    return {
+      // 特价机票
+      sales: []
+    };
+  },
   // 注册组件
   components: {
     SearchForm
+  },
+  mounted() {
+    // 请求特接机票列表
+    this.$axios({
+      url: "/airs/sale"
+    }).then(res => {
+      //data是特价的机票
+      const { data } = res.data;
+      // 保存到data中
+      this.sales = data;
+    });
   }
 };
 </script>
