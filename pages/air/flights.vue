@@ -4,7 +4,7 @@
       <!-- 顶部过滤列表 -->
       <div class="flights-content">
         <!-- 过滤条件 -->
-        <div></div>
+        <FlightsFilters :data="flightDataCache" @getData="getData" />
 
         <!-- 航班头部布局 -->
         <FlightsListHead />
@@ -42,12 +42,22 @@
 import FlightsListHead from "@/components/air/flightsListHead.vue";
 // 机票航班列表组件
 import FlightsItem from "@/components/air/flightsItem.vue";
+// 机票过滤组件
+import FlightsFilters from "@/components/air/flightsFilters.vue";
 export default {
   data() {
     return {
       // 总数据,里面包含了info,flights,total,options属性
       flightsData: {
-        flights: []
+        info: {},
+        flights: [],
+        options: {}
+      },
+      // 备份一份数据这个数据一旦被赋值后永远都不能被修改(类似原图)
+      flightDataCache: {
+        info: {},
+        flights: [],
+        options: {}
       },
       //   这个属性专门用来存放切割出来的数组
       // dataList: [],
@@ -61,7 +71,8 @@ export default {
   },
   components: {
     FlightsListHead,
-    FlightsItem
+    FlightsItem,
+    FlightsFilters
   },
   mounted() {
     // 请求机票列表;
@@ -73,7 +84,8 @@ export default {
 
       // 总的数据,里面包含了info,flights,total,options属性
       this.flightsData = res.data;
-
+      // 备份一份起来,这份不能被修改,因为是引用类型地址是一样的所以需要拷贝一份
+      this.flightDataCache = { ...res.data };
       //   总条数
       this.total = this.flightsData.total;
     });
@@ -90,6 +102,13 @@ export default {
     }
   },
   methods: {
+    // 这个事件是传递给过滤的子组件用于获取过滤后的数组
+    getData(arr) {
+      // arr是当前符合条件的航班
+      this.flightsData.flights = arr;
+      // 重置下总条数
+      this.total = arr.length;
+    },
     //   切换条数时候触发的事件
     handleSizeChange(val) {
       // 显示条数
