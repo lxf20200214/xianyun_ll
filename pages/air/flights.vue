@@ -11,7 +11,11 @@
 
         <!-- 航班信息 -->
         <div>
-          <FlightsItem v-for="(item, index) in dataList" :key="index" :data="item" />
+          <FlightsItem
+            v-for="(item, index) in dataList"
+            :key="index"
+            :data="item"
+          />
         </div>
         <!-- size-change:切换条数时候触发的事件 -->
         <!-- current-change:切换页数时候触发的事件 -->
@@ -32,6 +36,7 @@
       <!-- 侧边栏 -->
       <div class="aside">
         <!-- 侧边栏组件 -->
+        <FlightsAside />
       </div>
     </el-row>
   </section>
@@ -44,6 +49,8 @@ import FlightsListHead from "@/components/air/flightsListHead.vue";
 import FlightsItem from "@/components/air/flightsItem.vue";
 // 机票过滤组件
 import FlightsFilters from "@/components/air/flightsFilters.vue";
+// 机票侧边栏组件
+import FlightsAside from "@/components/air/flightsAside.vue";
 export default {
   data() {
     return {
@@ -72,24 +79,30 @@ export default {
   components: {
     FlightsListHead,
     FlightsItem,
-    FlightsFilters
+    FlightsFilters,
+    FlightsAside
   },
   mounted() {
-    // 请求机票列表;
-    this.$axios({
-      url: "/airs",
-      params: this.$route.query
-    }).then(res => {
-      console.log(res);
-
-      // 总的数据,里面包含了info,flights,total,options属性
-      this.flightsData = res.data;
-      // 备份一份起来,这份不能被修改,因为是引用类型地址是一样的所以需要拷贝一份
-      this.flightDataCache = { ...res.data };
-      //   总条数
-      this.total = this.flightsData.total;
-    });
+    // 请求机票列表
+    this.fetchList();
   },
+  // 1.watch可以监听路由的变化
+  // watch: {
+  //   // 监听路由的变化
+  //   $route() {
+  //     // 一旦路由发生了重新请求数据
+  //     this.fetchList();
+  //   }
+  // },
+
+  //2.可以通过组件内的导航守卫来监听路由的变化
+  beforeRouteUpdate(to, from, next) {
+    // next必须要执行的函数
+    next();
+    //一定要下跳转了在获取数据
+    this.fetchList();
+  },
+
   computed: {
     // 计算属性会监听函数内部所有实例(this)属性的变化
     // 页面要渲染的机票列表
@@ -102,6 +115,23 @@ export default {
     }
   },
   methods: {
+    // 请求机票列表
+    fetchList() {
+      // 请求机票列表;
+      this.$axios({
+        url: "/airs",
+        params: this.$route.query
+      }).then(res => {
+        console.log(res);
+
+        // 总的数据,里面包含了info,flights,total,options属性
+        this.flightsData = res.data;
+        // 备份一份起来,这份不能被修改,因为是引用类型地址是一样的所以需要拷贝一份
+        this.flightDataCache = { ...res.data };
+        //   总条数
+        this.total = this.flightsData.total;
+      });
+    },
     // 这个事件是传递给过滤的子组件用于获取过滤后的数组
     getData(arr) {
       // arr是当前符合条件的航班

@@ -13,13 +13,7 @@
       </span>
     </el-row>
 
-    <el-form
-      class="search-form-content"
-      :model="form"
-      :rules="rules"
-      ref="form"
-      label-width="80px"
-    >
+    <el-form class="search-form-content" :model="form" :rules="rules" ref="form" label-width="80px">
       <!-- 出发城市的输入框 -->
       <el-form-item label="出发城市" prop="departCity">
         <!-- fetch-suggestions 返回输入建议的方法 
@@ -61,13 +55,7 @@
         ></el-date-picker>
       </el-form-item>
       <el-form-item label>
-        <el-button
-          style="width:100%;"
-          type="primary"
-          icon="el-icon-search"
-          @click="handleSubmit"
-          >搜索</el-button
-        >
+        <el-button style="width:100%;" type="primary" icon="el-icon-search" @click="handleSubmit">搜索</el-button>
       </el-form-item>
       <div class="reverse">
         <span @click="handleReverse">换</span>
@@ -230,6 +218,9 @@ export default {
       // 表单验证
       this.$refs.form.validate(valid => {
         if (valid) {
+          // 保存this.form数据到vuex中,供历史记录调用
+          this.$store.commit("air/setSearchList", this.form);
+
           // 路由跳转,path指定的路径,query属性指定的是问号后面的参数
           // 如果是动态参数就是要params
           this.$router.push({
