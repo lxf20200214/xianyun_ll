@@ -85,7 +85,9 @@ export default {
           // 弹窗提示
           this.$message.success("登录成功,欢迎回来" + res.user.nickname);
           // 跳转到首页
-          this.$router.replace("/");
+          // this.$router.replace("/");
+          // 返回上一页
+          this.$router.back();
         }
       });
     }
