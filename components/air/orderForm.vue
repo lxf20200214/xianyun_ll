@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <div class="air-column">
-      <h2>剩机人</h2>
+      <h2>乘机人</h2>
       <el-form class="member-info" :model="form" :rules="rules" ref="form">
         <!-- 乘机人用户列表,根据form.users来循环 -->
         <div class="member-info-item" v-for="(item, index) in form.users" :key="index">
@@ -85,6 +85,8 @@
         <el-button type="warning" class="submit" @click="handleSubmit">提交订单</el-button>
       </div>
     </div>
+    <!-- 为了computed的allPrice能够执行,所以在这里渲染一下,但是不需要展示出来 -->
+    <span v-show="false">{{allPrice}}</span>
   </div>
 </template>
 
@@ -137,6 +139,37 @@ export default {
       }
     };
   },
+  computed: {
+    // 支付费用
+    allPrice() {
+      // 如果请求还没回来,直接返回0
+      if (!this.detail.seat_infos) {
+        return 0;
+      }
+      let price = 0;
+      // 首先加上单价和燃油费
+      price += this.detail.seat_infos.org_settle_price;
+      price += this.detail.airport_tax_audlet;
+      // 循环选中的保险的id获取保险的价格
+      this.form.insurances.forEach(v => {
+        // 循环后台返回的保险列表
+        this.detail.insurances.forEach(item => {
+          // 如果相等,说明当前的保险是选中的
+          if (v === item.id) {
+            // 把当前保险的价格加到总价
+            price += item.price;
+          }
+        });
+      });
+      // 根据人数价格翻倍
+      price *= this.form.users.length;
+      // 把price保存到store
+      this.$store.commit("air/setAllPrice", price);
+      this.$store.commit("air/setUsers", this.form.users.length);
+
+      return price;
+    }
+  },
   mounted() {
     //   获取问号的参数
     const { id, seat_xid } = this.$route.query;
@@ -151,8 +184,12 @@ export default {
         seat_xid
       }
     }).then(res => {
+      console.log(res);
+
       //  把机票的信息保存到data,里面有保险和右侧栏需要展示的数据
       this.detail = res.data;
+      // 把详细信息保存到store
+      this.$store.commit("air/setFlightData", this.detail);
     });
   },
   methods: {

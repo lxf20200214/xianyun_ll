@@ -1,7 +1,15 @@
 export const state = () => {
   return {
     // 历史查询
-    searchList: []
+    searchList: [],
+    // 选中的机票的详细信息
+    flightData: {
+      seat_infos: {}
+    },
+    // 总价格
+    allPrice: 0,
+    // 乘机人
+    users: ""
   };
 };
 
@@ -16,5 +24,17 @@ export const mutations = {
       // 只保留数组的前五位
       state.searchList.length = 5;
     }
+  },
+  // 存储选中的机票的详细信息
+  setFlightData(state, data) {
+    state.flightData = data;
+  },
+  // 存储总价格
+  setAllPrice(state, data) {
+    state.allPrice = data;
+  },
+  // 存储乘机人数
+  setUsers(state, data) {
+    state.users = data;
   }
 };
