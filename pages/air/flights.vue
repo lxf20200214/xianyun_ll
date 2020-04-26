@@ -10,27 +10,26 @@
         <FlightsListHead />
 
         <!-- 航班信息 -->
-        <div>
-          <FlightsItem
-            v-for="(item, index) in dataList"
-            :key="index"
-            :data="item"
-          />
+        <!-- 航班列表有值时候才展示这个列表 -->
+        <div v-if="flightsData.flights.length">
+          <FlightsItem v-for="(item, index) in dataList" :key="index" :data="item" />
+
+          <!-- size-change:切换条数时候触发的事件 -->
+          <!-- current-change:切换页数时候触发的事件 -->
+          <!-- current-page:当前的页数 -->
+          <!-- page-size:当前的条数 -->
+          <!-- total:总条数 -->
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="pageIndex"
+            :page-sizes="[5, 10, 15, 20]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+          ></el-pagination>
         </div>
-        <!-- size-change:切换条数时候触发的事件 -->
-        <!-- current-change:切换页数时候触发的事件 -->
-        <!-- current-page:当前的页数 -->
-        <!-- page-size:当前的条数 -->
-        <!-- total:总条数 -->
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="pageIndex"
-          :page-sizes="[5, 10, 15, 20]"
-          :page-size="pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-        ></el-pagination>
+        <div v-else class="empty">当前没有合适的航班</div>
       </div>
 
       <!-- 侧边栏 -->
@@ -169,5 +168,11 @@ export default {
 
 .aside {
   width: 240px;
+}
+
+.empty {
+  text-align: center;
+  line-height: 200px;
+  color: #999;
 }
 </style>

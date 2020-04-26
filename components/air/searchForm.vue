@@ -127,7 +127,15 @@ export default {
     },
 
     // tab切换时触发
-    handleSearchTab(item, index) {},
+    handleSearchTab(item, index) {
+      // 如果点击的是往返的按钮
+      if (index === 1) {
+        // 提示当前暂不支持往返机票
+        this.$alert("当前暂不支持往返机票", "提示", {
+          confirmButtonText: "确定"
+        });
+      }
+    },
 
     // 出发城市输入框获得焦点时触发(监听出发城市输入框的变化,一旦输入框的值发生了变化就会触发该事件)
     // value是输入框的值,cb是函数必须要调用

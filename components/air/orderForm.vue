@@ -235,7 +235,8 @@ export default {
             this.$message.success("验证码发送成功,模拟的验证码是:" + code);
           });
       } else {
-        alert("手机号码不能为空");
+        // 主动触发手机号码的验证
+        this.$refs.form2.validateField("contactPhone");
       }
     },
 
@@ -255,6 +256,14 @@ export default {
               data: this.form
             }).then(res => {
               this.$message.success("订单提交成功");
+              // 跳转到支付页
+              const { id } = res.data.data;
+              this.$router.push({
+                path: "/air/pay",
+                query: {
+                  id
+                }
+              });
             });
           }
         });
